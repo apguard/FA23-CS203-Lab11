@@ -8,11 +8,12 @@ import java.util.Scanner;
 
 public class Encrypter {
 
-   
+	StringBuffer fun = new StringBuffer();
     private String encrypted;
+    
     static ArrayList<String> list = new ArrayList<String>();
-int cool;
-int shift;
+
+int shift=4;
     /**
      * Default Constructor
      */
@@ -21,7 +22,15 @@ int shift;
         this.encrypted = "";
     }
 
-    /**
+    public int getShift() {
+		return shift;
+	}
+
+	public void setShift(int shift) {
+		this.shift = shift;
+	}
+
+	/**
      * Non-default Constructor
      * @param s - custom shift amount
      */
@@ -40,39 +49,93 @@ int shift;
     public void encrypt(String inputFilePath, String encryptedFilePath) throws Exception {
         //TODO: Call the read method, encrypt the file contents, and then write to new file
     	readFile(inputFilePath);
-    	//System.out.println(encrypted);
+    	 fun.delete(0, fun.length());
+    	
     	try(PrintWriter output = new PrintWriter(encryptedFilePath)){
-    		
-    		
-    	 shift = 1;
-    	 System.out.println(list);
-    	 for( String element : list ) {
+   	 for( String element : list ) {
     		 char [] ch = element.toCharArray();
+    		 String el = element;
     		 encrypted = "";
     	for (int i = 0; i< ch.length; i++ ) {
     		
-    	    if(ch[i] >='A' && ch[i] <= 'Z') {
+    	    if(Character.isUpperCase(ch[i])) {
     	    	
-    	    	int ascii = ch[i] + shift;
-    			 
-    			
+    	    	char ch1 =  (char) (((int ) el.charAt(i) + shift-65) %26+65 ); 	
+    	    	fun.append(ch1);
+    	    	
+    	}
+ 
+    	    
+    	    else if(Character.isLowerCase(ch[i])) {
+    	    	char ch1 = (char) (((int)el.charAt(i) + shift -97) % 26 + 97);
+    	    	fun.append(ch1);
+    	    	
+    	    }
+    	    else {
+    	    	
+    	    	fun.append(ch[i]);
+    	    }
+    	    
+    	     
+    	  }
+    	 }
+    	 output.println(fun);
+     	
+    	 output.close();
+    	}
+    		
+    	catch (Exception e) {
+    		System.out.println("error" + e.toString());
+    	}
+    	   //
+ 
+    }
+    
+    /**
+     * Decrypts the content of an encrypted file and writes the result to another file.
+     *
+     * @param messageFilePath    the path to the file containing the encrypted text
+     * @param decryptedFilePath the path to the file where the decrypted text will be written
+     * @throws Exception if an error occurs while reading or writing the files
+     */
+    public void decrypt(String messageFilePath, String decryptedFilePath) throws Exception {
+        //TODO: Call the read method, decrypt the file contents, and then write to new file
+    	fun.delete(0, fun.length());
+    	
+    	readFile(messageFilePath);
+    	//System.out.println(encrypted);
+    	
+    	try(PrintWriter output = new PrintWriter(decryptedFilePath)){
+    		
+    	
+    	 setShift(26-shift);
     	 
-    	
-    	
-    	String newcharacter = Character.toString(ascii);
-    	encrypted = encrypted + newcharacter;
-    	
-    	output.println(encrypted);}
+    	 for( String element : list ) {
+    		 char [] ch = element.toCharArray();
+    		 String el = element;
+    		 encrypted = "";
+    		 System.out.println(fun);
+    	for (int i = 0; i< ch.length; i++ ) {
+    		
+    	    if(Character.isUpperCase(ch[i])) {
+    	    	
+    	    	char ch1 =  (char) (((int ) el.charAt(i) + shift-65) % 26+65 ); 	
+    	    	fun.append(ch1);
+    	    }
+    	    	
+    	    	    else if(Character.isLowerCase(ch[i])) {char ch1 = (char) (((int)el.charAt(i) + shift -97) % 26 + 97);
+        	    	fun.append(ch1);}
     	    
     	    else {
-    	    	String newycharacter = Character.toString((cool+shift -97)%26+97);
-    	    	encrypted = encrypted+ newycharacter;
-    	    	output.println(encrypted);
+    	    	fun.append(ch[i]);
+    	    	
     	    	
     	    }
     	     
     	  }
     	 }
+    	 output.println(fun);
+     	
     	 output.close();
     	}
     		
@@ -84,32 +147,6 @@ int shift;
     	
     }
     
-    
-    
-    
-
-    /**
-     * Decrypts the content of an encrypted file and writes the result to another file.
-     *
-     * @param messageFilePath    the path to the file containing the encrypted text
-     * @param decryptedFilePath the path to the file where the decrypted text will be written
-     * @throws Exception if an error occurs while reading or writing the files
-     */
-    public void decrypt(String messageFilePath, String decryptedFilePath) throws Exception {
-        //TODO: Call the read method, decrypt the file contents, and then write to new file
-    	String encryptedMessage = readFile(messageFilePath);
-    	encrypted = "";
-    	shift = -shift;
-    	encrypt(encryptedMessage, decryptedFilePath);
-    	
-   
-    }
-    	
-    	
-   
-    	
-    	
-    
 
     /**
      * Reads the content of a file and returns it as a string.
@@ -120,11 +157,13 @@ int shift;
      */
     private static String readFile(String filePath) throws Exception {
         String message = "";
+        String line = "";
+        list.clear();     
         try(Scanner fileScanner = new Scanner(Paths.get(filePath))) {
         while(fileScanner.hasNextLine()) {
-        	String line = fileScanner.nextLine();
+        	 line = fileScanner.nextLine();
         	message = line;
-        	System.out.println(line);
+        	
         		list.add(line);
         }
         //TODO: Read file from filePath
